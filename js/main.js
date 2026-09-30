@@ -2,11 +2,16 @@ const DATA_URL = "./data/products.json";
 
 const priceBands = [
   {label:"全部", min:0, max:Infinity},
-  {label:"300元以下", min:0, max:300},
-  {label:"300–500元", min:301, max:500},
-  {label:"500–800元", min:501, max:800},
-  {label:"800–1200元", min:801, max:1200},
-  {label:"1200元以上", min:1201, max:Infinity},
+  {label:"0–50元", min:0, max:50},
+  {label:"51–100元", min:51, max:100},
+  {label:"101–150元", min:101, max:150},
+  {label:"151–200元", min:151, max:200},
+  {label:"201–250元", min:201, max:250},
+  {label:"251–300元", min:251, max:300},
+  {label:"301–500元", min:301, max:500},
+  {label:"501–800元", min:501, max:800},
+  {label:"801–1200元", min:801, max:1200},
+  {label:"1201元以上", min:1201, max:Infinity},
 ];
 const swatchColors = ["#7B2331","#B08D57","#4A5B4A","#5C1A24","#8A6A3F"];
 
@@ -49,8 +54,27 @@ function updateStructuredData(){
   document.getElementById('structuredData').textContent = JSON.stringify(structuredData);
 }
 
+// 熱門禮贈品專區用到、但商品資料裡還沒有的類別
+const extraCats = ["餐具", "水晶獎座", "電子產品", "其他禮品"];
+
+// 類別圖片：把檔案放進 images/categories/，再把檔名填進對應的類別，例如 "包類": "bag.jpg"
+const catImages = {
+  "全部": "",
+  "包類": "",
+  "戶外露營": "",
+  "保溫杯瓶": "",
+  "鍋具": "",
+  "廚房小物": "",
+  "刀具": "",
+  "保鮮餐盒": "",
+  "餐具": "",
+  "水晶獎座": "",
+  "電子產品": "",
+  "其他禮品": "",
+};
+
 function getCats(){
-  return products ? ["全部", ...new Set(products.map(p => p.cat))] : ["全部"];
+  return products ? ["全部", ...new Set([...products.map(p => p.cat), ...extraCats])] : ["全部"];
 }
 
 function setEmptyMessage(msg){
@@ -89,19 +113,33 @@ function render(){
         <div class="card-name">${p.n}</div>
         <div class="card-sku">型號 ${p.sku}</div>
         <div class="card-price">NT$ ${p.price.toLocaleString()}</div>
-        <a class="card-ask" href="https://line.me/R/ti/p/@YOUR_LINE_ID">詢問這項商品</a>
       </div>
     </div>
   `).join('');
   empty.style.display = 'none';
-  if (!list.length) setEmptyMessage('這個區間目前沒有商品，換個篩選條件試試看。');
+  if (!list.length){
+    const catHasItems = activeCat === "全部" || products.some(p => p.cat === activeCat);
+    setEmptyMessage(catHasItems
+      ? '這個區間目前沒有商品，換個篩選條件試試看。'
+      : `「${activeCat}」商品即將上架，歡迎加 LINE 或來電詢問。`);
+  }
+}
+
+function countInBand(band){
+  if (!products) return null;
+  return products.filter(p =>
+    p.price >= band.min && p.price <= band.max &&
+    (activeCat === "全部" || p.cat === activeCat)
+  ).length;
 }
 
 function buildChips(){
   const priceRow = document.getElementById('priceRow');
-  priceRow.innerHTML = priceBands.map((b,i) =>
-    `<button class="chip ${i===activeBand?'active':''}" data-i="${i}">${b.label}</button>`
-  ).join('');
+  priceRow.innerHTML = priceBands.map((b,i) => {
+    const n = countInBand(b);
+    const countTag = n === null ? '' : `<span class="count">${n}</span>`;
+    return `<button class="chip ${i===activeBand?'active':''} ${n===0?'is-empty':''}" data-i="${i}">${b.label}${countTag}</button>`;
+  }).join('');
   priceRow.querySelectorAll('.chip').forEach(el => el.onclick = () => {
     activeBand = +el.dataset.i;
     render();
@@ -109,10 +147,18 @@ function buildChips(){
   });
 
   const catRow = document.getElementById('catRow');
-  catRow.innerHTML = getCats().map(c =>
-    `<button class="chip ${c===activeCat?'active':''}" data-c="${c}">${c}</button>`
-  ).join('');
-  catRow.querySelectorAll('.chip').forEach(el => el.onclick = () => onCategoryClick(el.dataset.c));
+  catRow.innerHTML = getCats().map(c => {
+    const empty = c !== "全部" && !products.some(p => p.cat === c);
+    const img = catImages[c];
+    const media = img
+      ? `<img src="./images/categories/${img}" alt="${c}" loading="lazy">`
+      : `<span class="cat-placeholder">圖片待提供</span>`;
+    return `<button class="cat-tile ${c===activeCat?'active':''} ${empty?'is-empty':''}" data-c="${c}">
+      <span class="cat-media">${media}</span>
+      <span class="cat-name">${c}</span>
+    </button>`;
+  }).join('');
+  catRow.querySelectorAll('.cat-tile').forEach(el => el.onclick = () => onCategoryClick(el.dataset.c));
 }
 
 function onCategoryClick(cat){
@@ -120,6 +166,11 @@ function onCategoryClick(cat){
   buildChips();
   render();
 }
+
+document.querySelectorAll('.feat-tile[data-cat]').forEach(el => el.addEventListener('click', () => {
+  activeBand = 0;
+  onCategoryClick(el.dataset.cat);
+}));
 
 async function loadProducts(){
   isLoading = true;
