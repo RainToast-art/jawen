@@ -42,8 +42,8 @@ h1,h2,h3{margin:0; letter-spacing:-.02em;}
 .fab-btn:hover{transform:scale(1.08); box-shadow:0 14px 30px -8px rgba(0,0,0,.5);}
 .fab-line{background:#06C755;}
 .fab-line img{width:100%; height:100%; display:block;}
-.fab-tel{background:#111; color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.9), 0 10px 24px -8px rgba(0,0,0,.45);}
-.fab-tel svg{width:32px; height:32px;}
+.fab-tel, .fab-mail{background:#111; color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.9), 0 10px 24px -8px rgba(0,0,0,.45);}
+.fab-tel svg, .fab-mail svg{width:32px; height:32px;}
 
 /* ---------- Buttons ---------- */
 .btn{
@@ -88,15 +88,6 @@ h1,h2,h3{margin:0; letter-spacing:-.02em;}
 }
 .feat-img{object-fit:cover; display:block;}
 .feat-tile:hover .feat-placeholder, .feat-tile:hover .feat-img{transform:scale(1.06);}
-.feat-tile:has(.feat-img)::after{
-  content:""; position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.05) 55%);
-}
-.feat-label{
-  position:absolute; left:22px; bottom:16px; z-index:1;
-  font-size:clamp(20px,2.4vw,28px); font-weight:800; letter-spacing:-.01em;
-}
-.feat-tile:has(.feat-img) .feat-label{color:#fff;}
 
 /* ---------- Hero banner ---------- */
 .hero-banner{max-width:1100px; margin:0 auto; padding:24px 20px 0;}
@@ -212,7 +203,7 @@ h1,h2,h3{margin:0; letter-spacing:-.02em;}
 footer{background:#0B0B0B; color:#EDEDED; padding:72px 20px 40px;}
 .foot-inner{max-width:1100px; margin:0 auto;}
 footer h2{color:#fff; font-size:clamp(28px,5vw,48px); font-weight:900; line-height:1.15; margin-bottom:14px; letter-spacing:-.03em;}
-footer p{color:#A8A8A8; font-size:15px; margin:0 0 28px; max-width:520px;}
+footer p{color:#A8A8A8; font-size:15px; margin:0 0 28px;}
 .foot-ctas{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:48px;}
 footer .btn-tel{color:#fff; border-color:#555;}
 footer .btn-tel:hover{background:#fff; color:#111; border-color:#fff;}
@@ -221,9 +212,10 @@ footer .btn-tel:hover{background:#fff; color:#111; border-color:#fff;}
 @media (max-width:600px){
   .fab{right:calc(14px + env(safe-area-inset-right,0px)); bottom:calc(14px + env(safe-area-inset-bottom,0px)); gap:10px;}
   .fab-btn{width:60px; height:60px;}
-  .fab-tel svg{width:28px; height:28px;}
+  .fab-tel svg, .fab-mail svg{width:28px; height:28px;}
   .btn{padding:7px 13px; font-size:13px;}
   .btn-lg{padding:13px 22px; font-size:15px;}
+  footer p{font-size:14px;}
   .hero{padding-top:40px;}
   .hero-banner{padding:16px 16px 0;}
   .hero-banner img{border-radius:14px;}
@@ -236,7 +228,6 @@ footer .btn-tel:hover{background:#fff; color:#111; border-color:#fff;}
       "c c"
       "e e";
   }
-  .feat-label{left:14px; bottom:10px;}
   .filters-panel{padding:22px 18px 20px; border-radius:20px;}
   .chip{padding:9px 15px; font-size:14.5px;}
   .cat-grid{grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px 10px;}
