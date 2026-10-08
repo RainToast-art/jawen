@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
 <title>嘉玟禮品｜企業禮贈品採購型錄</title>
 <meta name="description" content="企業禮贈品採購型錄，提供商務包、戶外露營用品、保溫杯瓶、鍋具、廚房用品與保鮮餐盒，適合公司贈品、大宗採購與客製化詢價。">
 <meta name="keywords" content="企業禮贈品, 公司贈品, 商務包, 保溫杯, 戶外用品, 禮品採購, 大宗採購">
@@ -28,39 +29,157 @@
   }
 }
 </script>
+<!-- 瀏覽器分頁小圖示（取 Logo 的火焰部分）；apple-touch-icon 是 iPhone 加到主畫面時用的 -->
+<link rel="icon" href="./favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="192x192" href="./images/brand/icon-192.png">
+<link rel="apple-touch-icon" href="./images/brand/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./style/main.css">
 </head>
 <body>
 
-<header class="hero-banner">
-  <h1 class="sr-only">嘉玟禮品｜企業禮贈品採購型錄</h1>
-  <img src="./images/hero-banner.jpg" alt="嘉玟禮品 Jawen Co., Ltd.｜企業禮贈品・公關紀念品・年節贈禮・廣告促銷" width="1983" height="793" fetchpriority="high">
+<header class="site-header" id="siteHeader">
+  <!-- 第一層：左邊選單鈕（手機）、中間 Logo、右邊搜尋和詢價車 -->
+  <div class="nav-top">
+    <div class="nav-left">
+      <button class="icon-btn nav-toggle" id="navToggle" type="button" aria-label="開啟商品分類選單" aria-controls="navDrawer" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+    <!-- Logo 原檔：images/brand/original/logo.png；選單列用的是裁掉透明邊、縮小後的 images/brand/logo.png -->
+    <a class="brand" href="#" aria-label="嘉玟禮品 回到頂端">
+      <img class="brand-logo" src="./images/brand/logo.png" alt="" width="113" height="120">
+      <span class="brand-text"><strong>嘉玟禮品</strong><small>JAWEN CO., LTD.</small></span>
+    </a>
+    <div class="nav-actions">
+      <button class="icon-btn" id="searchBtn" type="button" aria-label="搜尋商品" aria-controls="searchPanel" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M15.5 15.5L20 20"/></svg>
+      </button>
+      <span class="nav-divider" aria-hidden="true"></span>
+      <button class="icon-btn cart-btn" id="cartBtn" type="button" aria-label="詢價車">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.2 10.4a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2"/><circle cx="9.5" cy="19.5" r="1.4" fill="currentColor"/><circle cx="17" cy="19.5" r="1.4" fill="currentColor"/></svg>
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 第二層：商品分類（電腦版） -->
+  <nav class="main-nav" aria-label="商品分類">
+    <ul class="nav-list" id="navList"></ul>
+  </nav>
+
+  <!-- 搜尋面板：點右上角放大鏡展開 -->
+  <div class="search-panel" id="searchPanel" hidden>
+    <form class="search-form" id="searchForm" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M15.5 15.5L20 20"/></svg>
+      <input id="searchInput" type="search" placeholder="搜尋商品名稱、型號或分類" autocomplete="off" enterkeyhint="search" aria-label="搜尋商品">
+      <button class="search-cancel" id="searchClose" type="button">取消</button>
+    </form>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <div class="mega" id="megaPanel" hidden></div>
 </header>
 
+<div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+<aside class="drawer" id="navDrawer" aria-label="商品分類" aria-hidden="true">
+  <div class="drawer-head">
+    <strong>商品分類</strong>
+    <button class="icon-btn" id="drawerClose" type="button" aria-label="關閉選單">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <ul class="drawer-list" id="drawerList"></ul>
+</aside>
+
+<!-- 詢價車：從右側滑出，送出後資料進 Google 表單（設定在 main.js 的 INQUIRY_FORM） -->
+<div class="drawer-backdrop" id="cartBackdrop" hidden></div>
+<aside class="drawer cart-panel" id="cartPanel" aria-label="詢價車" aria-hidden="true">
+  <div class="drawer-head">
+    <strong>詢價車 <span class="cart-head-count" id="cartHeadCount"></span></strong>
+    <button class="icon-btn" id="cartClose" type="button" aria-label="關閉詢價車"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+
+  <div class="cart-scroll">
+    <div id="cartView">
+      <ul class="cart-list" id="cartList"></ul>
+      <div class="cart-empty" id="cartEmpty" hidden>
+        <p>詢價車還是空的</p>
+        <small>點商品右下角的「＋ 加入詢價」，就可以把想詢價的商品加進來。</small>
+      </div>
+
+      <form class="inq-form" id="inqForm" novalidate>
+        <h3>聯絡資料</h3>
+        <p class="form-hint">留下聯絡方式，我們會盡快提供正式報價。</p>
+        <label class="field"><span>稱呼 <em>*</em></span><input name="name" autocomplete="name" placeholder="例如：王小姐"></label>
+        <fieldset class="field-group">
+          <legend>聯絡方式 <em>*</em> <small>至少填一項</small></legend>
+          <label class="field"><span>電話</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel"></label>
+          <label class="field"><span>LINE ID</span><input name="line" autocomplete="off"></label>
+          <label class="field"><span>Email</span><input name="email" type="email" inputmode="email" autocomplete="email"></label>
+        </fieldset>
+        <label class="field"><span>公司名稱 <small>選填</small></span><input name="company" autocomplete="organization"></label>
+        <label class="field"><span>備註 <small>選填</small></span><textarea name="note" rows="3" placeholder="例如：需要的日期、是否要印 Logo"></textarea></label>
+        <!-- 防垃圾訊息：一般人看不到這個欄位，機器人填了就不送出 -->
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="form-error" id="formError" role="alert" hidden></p>
+        <button class="btn btn-submit" id="submitBtn" type="submit">送出詢價</button>
+        <p class="privacy">您填寫的資料僅用於本次報價聯繫，不會提供給第三方。</p>
+        <div class="alt-actions">
+          <span>習慣用 LINE？</span>
+          <button type="button" id="copyList">複製詢價清單</button>
+          <a href="https://line.me/ti/p/Xq18_HXRjr" target="_blank" rel="noopener">開啟 LINE</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="cart-done" id="cartDone" hidden>
+      <div class="done-icon" aria-hidden="true">✓</div>
+      <h3>已收到您的詢價</h3>
+      <p>詢價編號 <strong id="doneId"></strong></p>
+      <p class="done-note">我們會依您留下的聯絡方式盡快與您聯繫。<br>急件歡迎直接加 LINE 或來電 0963620839（潘先生）。</p>
+      <button class="btn btn-tel btn-lg" id="doneClose" type="button">繼續逛逛</button>
+    </div>
+  </div>
+</aside>
+
+<h1 class="sr-only">嘉玟禮品｜企業禮贈品採購型錄</h1>
+
 <section class="featured" aria-label="熱門禮贈品">
-  <!-- 圖片提供後，把 <span class="feat-placeholder">…</span> 換成 <img class="feat-img" src="./images/featured/檔名.jpg" alt="名稱"> -->
-  <div class="featured-grid">
-    <a class="feat-tile feat-a" href="#catalog" data-cat="保溫杯瓶"><img class="feat-img" src="./images/featured/bottle.jpg" alt="保溫瓶"></a>
-    <a class="feat-tile feat-b" href="#catalog" data-cat="其他禮品"><img class="feat-img" src="./images/featured/OtherItem.jpg" alt="其他禮品"></a>
-    <a class="feat-tile feat-c" href="#catalog" data-cat="水晶獎座"><img class="feat-img" src="./images/featured/award.jpg" alt="水晶獎座"></a>
-    <a class="feat-tile feat-d" href="#catalog" data-cat="電子產品"><img class="feat-img" src="./images/featured/Electrical.jpg" alt="電子產品"></a>
-    <a class="feat-tile feat-e" href="#catalog" data-cat="餐具"><img class="feat-img" src="./images/featured/Dish.jpg" alt="餐具"></a>
+  <!-- 新增輪播圖：複製一行 <a class="slide">，換掉 data-cat（對應的大類名稱）、兩個 src 和 alt -->
+  <div class="carousel" id="featCarousel" aria-roledescription="carousel">
+    <div class="car-track">
+      <a class="slide" href="#catalog" data-cat="水晶獎座" aria-label="水晶獎座（1/5）"><img class="slide-bg" src="./images/featured/award.jpg" alt=""><img class="slide-img" src="./images/featured/award.jpg" alt="水晶獎座"></a>
+      <a class="slide" href="#catalog" data-cat="隨身杯瓶" aria-label="精選杯瓶（2/5）"><img class="slide-bg" src="./images/featured/bottle.jpg" alt="" loading="lazy"><img class="slide-img" src="./images/featured/bottle.jpg" alt="精選杯瓶" loading="lazy"></a>
+      <a class="slide" href="#catalog" data-cat="廚房用品" aria-label="實用餐具（3/5）"><img class="slide-bg" src="./images/featured/Dish.jpg" alt="" loading="lazy"><img class="slide-img" src="./images/featured/Dish.jpg" alt="實用餐具" loading="lazy"></a>
+      <a class="slide" href="#catalog" data-cat="數位3C" aria-label="電子產品（4/5）"><img class="slide-bg" src="./images/featured/Electrical.jpg" alt="" loading="lazy"><img class="slide-img" src="./images/featured/Electrical.jpg" alt="電子產品" loading="lazy"></a>
+      <a class="slide" href="#catalog" data-cat="其他禮品" aria-label="其他禮品（5/5）"><img class="slide-bg" src="./images/featured/OtherItem.jpg" alt="" loading="lazy"><img class="slide-img" src="./images/featured/OtherItem.jpg" alt="其他禮品" loading="lazy"></a>
+    </div>
+    <button class="car-btn car-prev" type="button" aria-label="上一張"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="car-btn car-next" type="button" aria-label="下一張"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></button>
+    <div class="car-dots"></div>
   </div>
 </section>
 
-<div class="filters" id="catalog">
-  <div class="filters-panel">
-    <h3>依價格區間瀏覽 <small>Price</small></h3>
-    <div class="chip-row" id="priceRow"></div>
-    <h3>依商品類型篩選 <small>Category</small></h3>
-    <div class="cat-grid" id="catRow"></div>
+<section class="catalog" id="catalog" aria-label="商品型錄">
+  <div class="catalog-head">
+    <nav class="crumbs" id="crumbs" aria-label="目前分類"></nav>
+    <span class="result-count" id="resultCount"></span>
   </div>
-</div>
+  <div class="chip-row sub-row" id="subRow"></div>
+  <div class="price-filter">
+    <span class="filter-label">價格區間</span>
+    <div class="chip-row" id="priceRow"></div>
+  </div>
+</section>
 
 <div class="grid" id="grid"></div>
-<div class="empty" id="empty">請點選上方「依商品類型篩選」的按鈕，載入商品型錄。</div>
+<div class="empty" id="empty">正在下載商品資料…</div>
+
+<div class="hero-banner">
+  <img src="./images/hero-banner.jpg" alt="嘉玟禮品 Jawen Co., Ltd.｜企業禮贈品・公關紀念品・年節贈禮・廣告促銷" width="1983" height="793" loading="lazy">
+</div>
 
 <footer>
   <div class="foot-inner">
@@ -80,13 +199,10 @@
 
 <div class="fab" aria-label="快速聯絡">
   <a class="fab-btn fab-line" href="https://line.me/ti/p/Xq18_HXRjr" aria-label="加 LINE 詢價" title="加 LINE 詢價">
-    <img src="./images/line-icon.webp" alt="" width="68" height="68">
+    <img src="./images/line-icon.webp" alt="" width="68" height="68"><span class="fab-label">LINE 詢價</span>
   </a>
   <a class="fab-btn fab-tel" href="tel:+886963620839" aria-label="致電 0963620839" title="致電 0963620839">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>
-  </a>
-  <a class="fab-btn fab-mail" href="mailto:rain23432@gmail.com?subject=%E7%A6%AE%E8%B4%88%E5%93%81%E8%A9%A2%E5%83%B9" aria-label="寄 Email 詢問" title="寄 Email 詢問">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg><span class="fab-label">撥打電話</span>
   </a>
 </div>
 
